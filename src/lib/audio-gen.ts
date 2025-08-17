@@ -1,24 +1,28 @@
+import { AudioChannel as AudioChannelRecord } from "@/types/audio";
+import type {
+  AudioChannel,
+  AudioFormat,
+  AudioKind,
+  AudioNoiseColor,
+} from "@/types/audio";
 import { getFFmpeg } from "./ffmpeg";
-
-export type AudioKind = "silence" | "sine" | "noise";
-export type AudioFormat = "wav" | "mp3" | "m4a" | "ogg" | "opus" | "webm";
 
 export type GenOptions = {
   kind: AudioKind;
   durationSec: number; // 길이(초)
   format: AudioFormat; // 확장자
-  sampleRate?: number; // 44100, 48000 ...
-  channels?: 1 | 2; // 모노/스테레오
+  sampleRate: number; // 44100, 48000 ...
+  channels: AudioChannel; // 모노/스테레오
   frequency?: number; // sine 전용: Hz
-  noiseColor?: "white" | "pink" | "brown" | "blue" | "violet"; // noise 전용
+  noiseColor?: AudioNoiseColor; // noise 전용
   bitrateK?: number; // 압축 포맷용 비트레이트(kbps) - mp3/aac 등
-  title?: string; // 메타데이터
-  artist?: string;
+  title: string; // 메타데이터
+  artist: string;
 };
 
 function buildInputFilter(opts: GenOptions) {
-  const r = opts.sampleRate ?? 48000;
-  const cl = (opts.channels ?? 2) === 2 ? "stereo" : "mono";
+  const r = opts.sampleRate;
+  const cl = AudioChannelRecord[opts.channels];
 
   switch (opts.kind) {
     case "silence":
@@ -31,9 +35,7 @@ function buildInputFilter(opts: GenOptions) {
     case "noise": {
       const color = opts.noiseColor ?? "white";
       // anoisesrc: color=white|pink|brown|blue|violet
-      return `-f lavfi -t ${
-        opts.durationSec
-      } -i anoisesrc=color=${color}:r=${r}:c=${cl === "stereo" ? 2 : 1}`;
+      return `-f lavfi -t ${opts.durationSec} -i anoisesrc=color=${color}:r=${r}:c=${opts.channels}`;
     }
   }
 }
@@ -59,10 +61,10 @@ function codecArgs(format: AudioFormat, bitrateK?: number): string {
   }
 }
 
-function metadataArgs(title?: string, artist?: string): string[] {
+function metadataArgs(title: string, artist: string): string[] {
   const parts: string[] = [];
-  if (title) parts.push("-metadata", `title=${title}`);
-  if (artist) parts.push("-metadata", `artist=${artist}`);
+  parts.push("-metadata", `title=${title}`);
+  parts.push("-metadata", `artist=${artist}`);
   return parts;
 }
 
@@ -70,10 +72,7 @@ export async function generateAudio(
   opts: GenOptions,
   onProgress?: (p: number) => void
 ): Promise<{ blob: Blob; filename: string }> {
-  console.log("generateAudio", opts);
   const ffmpeg = await getFFmpeg(onProgress);
-  ffmpeg.on("log", ({ message }) => console.debug("[ffmpeg]", message));
-  ffmpeg.on("progress", (p) => console.log("progress", p.progress));
 
   const input = buildInputFilter(opts);
   const codec = codecArgs(opts.format, opts.bitrateK);
@@ -94,7 +93,6 @@ export async function generateAudio(
     outName,
   ].filter(Boolean);
 
-  console.log("args", args);
   await ffmpeg.exec(args);
   const data = await ffmpeg.readFile(outName);
   const blob = new Blob([data as Uint8Array], { type: mimeOf(opts.format) });
