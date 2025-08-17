@@ -21,6 +21,11 @@ export default function Header() {
             <Link to="/audio">Audio</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+            <Link to="/video">Video</Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
   );
