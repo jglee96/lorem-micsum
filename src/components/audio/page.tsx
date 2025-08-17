@@ -87,7 +87,7 @@ export default function AudioGeneratorPage() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl p-6">
+    <div className="mx-auto max-w-3xl p-6 flex flex-col gap-4">
       <h1 className="text-2xl font-bold mb-4">Audio Generator</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
@@ -329,41 +329,48 @@ export default function AudioGeneratorPage() {
             />
           </div>
 
-          <div className="flex items-center gap-3">
-            <Button type="submit" disabled={progress !== null}>
-              Generate
-            </Button>
-            <Button type="button" onClick={handleResetForm}>
-              Reset
-            </Button>
-            {progress !== null && (
-              <span className="text-sm text-muted-foreground">
-                Processing… {progress}%
-              </span>
-            )}
-          </div>
-
-          {url && (
-            <div className="grid gap-2">
-              <audio controls src={url} />
-              <div className="flex gap-2">
-                <a download={filename} href={url}>
-                  <Button variant="secondary">Download {filename}</Button>
-                </a>
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    URL.revokeObjectURL(url);
-                    setUrl(null);
-                  }}
-                >
-                  Clear
-                </Button>
-              </div>
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              {progress !== null && (
+                <span className="text-sm text-muted-foreground">
+                  Processing… {Math.max(0, Math.min(progress, 100))}%
+                </span>
+              )}
             </div>
-          )}
+            <div className="flex items-center gap-2">
+              <Button type="submit" disabled={progress !== null}>
+                Generate
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleResetForm}
+              >
+                Reset
+              </Button>
+            </div>
+          </div>
         </form>
       </Form>
+      {url && (
+        <div className="flex flex-row items-center justify-between flex-wrap gap-2">
+          <audio controls src={url} />
+          <div className="flex gap-2">
+            <a download={filename} href={url}>
+              <Button variant="secondary">Download {filename}</Button>
+            </a>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                URL.revokeObjectURL(url);
+                setUrl(null);
+              }}
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
