@@ -161,7 +161,6 @@ export default function AudioGeneratorPage() {
                     <Input
                       type="number"
                       min={1}
-                      max={600}
                       {...field}
                       onChange={(e) => field.onChange(Number(e.target.value))}
                     />
