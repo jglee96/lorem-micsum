@@ -95,7 +95,7 @@ export async function generateAudio(
 
   await ffmpeg.exec(args);
   const data = await ffmpeg.readFile(outName);
-  const blob = new Blob([data as Uint8Array], { type: mimeOf(opts.format) });
+  const blob = new Blob([data as any], { type: mimeOf(opts.format) });
   // 정리
   await ffmpeg.deleteFile(outName);
   return { blob, filename: outName };
