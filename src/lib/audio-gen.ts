@@ -80,7 +80,7 @@ export async function generateAudio(
 
   const outName = `lorem-micsum.${opts.format}`;
 
-  // ffmpeg.run 에 인자를 배열로 넘겨도 되지만, 문자열 파싱이 더 편한 형태로 구성
+  // ffmpeg.exec 에 인자를 배열로 넘겨도 되지만, 문자열 파싱이 더 편한 형태로 구성
   // 쉘은 아니므로 공백 단위 분해가 필요. 여기서는 간단히 split, 문자열 리터럴 처리된 부분 없음.
   const args = [
     ...input.split(" "),
