@@ -116,7 +116,7 @@ export async function generateVideo(
     console.log("Reading file:", outName);
     const data = await ffmpeg.readFile(outName);
     console.log("File read successful, data type:", typeof data);
-    const blob = new Blob([data as Uint8Array], { type: mimeOf(opts.format) });
+    const blob = new Blob([data as any], { type: mimeOf(opts.format) });
     console.log("Blob created, size:", blob.size);
     await ffmpeg.deleteFile(outName);
     console.log("File deleted");
