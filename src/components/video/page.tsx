@@ -2,7 +2,6 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import {
   generateVideo,
-  isVideoAudioMuxSupported,
   VideoGenerationError,
 } from "@/lib/video-gen";
 import { Button } from "@/components/ui/button";
@@ -30,18 +29,10 @@ export default function VideoGeneratorPage() {
   const [format, setFormat] = React.useState<VideoFormat>("mp4");
   const [duration, setDuration] = React.useState(5);
   const [resolution, setResolution] = React.useState("640x360");
-  const [withAudio, setWithAudio] = React.useState(false);
   const [progress, setProgress] = React.useState<number | null>(null);
   const [url, setUrl] = React.useState<string | null>(null);
   const [filename, setFilename] = React.useState("");
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  const audioMuxSupported = isVideoAudioMuxSupported(format);
-
-  React.useEffect(() => {
-    if (!audioMuxSupported && withAudio) {
-      setWithAudio(false);
-    }
-  }, [audioMuxSupported, withAudio]);
 
   const onGenerate = async () => {
     if (url) {
@@ -53,7 +44,7 @@ export default function VideoGeneratorPage() {
     setProgress(0);
     try {
       const { blob, filename } = await generateVideo(
-        { kind, format, durationSec: duration, resolution, withAudio },
+        { kind, format, durationSec: duration, resolution, withAudio: false },
         (p) => setProgress(Math.round(p * 100))
       );
       const objectUrl = URL.createObjectURL(blob);
@@ -76,7 +67,7 @@ export default function VideoGeneratorPage() {
   const notes = [
     "Multiple synthetic source patterns",
     "Fast export to mp4, webm, or ogg",
-    "Optional audio track in the same render",
+    "Silent test clips for preview and QA",
   ] as const;
 
   return (
@@ -118,8 +109,8 @@ export default function VideoGeneratorPage() {
               </h2>
             </div>
             <p className="max-w-sm text-sm leading-6 text-muted-foreground">
-              Keep the workflow compact: set the source, output shape, and
-              optional audio, then render.
+              Keep the workflow compact: set the source and output shape, then
+              render a silent clip.
             </p>
           </div>
 
@@ -178,36 +169,6 @@ export default function VideoGeneratorPage() {
             </div>
           </div>
 
-          <div className="my-6 hairline" />
-
-          <div className="editorial-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="section-kicker mb-2">Optional audio track</p>
-              <p className="text-sm leading-6 text-muted-foreground">
-                {audioMuxSupported
-                  ? "Include audio when you need a more realistic export artifact."
-                  : "Audio-in-video export is temporarily unavailable while we validate a stable browser FFmpeg path."}
-              </p>
-            </div>
-            <label className="flex items-center gap-3 rounded-full border border-border/70 bg-background/65 px-4 py-3">
-              <input
-                id="audio"
-                type="checkbox"
-                className="size-4 accent-[var(--color-primary)]"
-                checked={audioMuxSupported ? withAudio : false}
-                disabled={!audioMuxSupported}
-                onChange={(e) => setWithAudio(e.target.checked)}
-              />
-              <span
-                className={`font-ui text-sm font-semibold ${
-                  audioMuxSupported ? "text-foreground" : "text-muted-foreground"
-                }`}
-              >
-                Include audio
-              </span>
-            </label>
-          </div>
-
           <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-h-11 items-center text-sm text-muted-foreground">
               {progress !== null
@@ -228,7 +189,6 @@ export default function VideoGeneratorPage() {
                   setFormat("mp4");
                   setDuration(5);
                   setResolution("640x360");
-                  setWithAudio(false);
                   setProgress(null);
                   setErrorMessage(null);
                   if (url) {

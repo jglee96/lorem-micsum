@@ -63,17 +63,11 @@ describe("VideoGeneratorPage", () => {
     expect(screen.getByText("lorem-micsum.mp4")).toBeTruthy();
   });
 
-  it("shows the audio mux limitation clearly in the UI", async () => {
+  it("keeps video generation silent without exposing audio controls", async () => {
     render(<VideoGeneratorPage />);
 
-    expect(
-      screen.getAllByLabelText("Include audio")[0].hasAttribute("disabled")
-    ).toBe(true);
-    expect(
-      screen.getByText(
-        "Audio-in-video export is temporarily unavailable while we validate a stable browser FFmpeg path."
-      )
-    ).toBeTruthy();
+    expect(screen.queryByLabelText("Include audio")).toBeNull();
+    expect(screen.getByText("Silent test clips for preview and QA")).toBeTruthy();
   });
 
   it("restores the UI after a failed render", async () => {
