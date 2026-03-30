@@ -1,12 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  ArrowUpRight,
+  AudioWaveform,
+  Video,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/")({
@@ -14,149 +12,181 @@ export const Route = createFileRoute("/")({
 });
 
 function App() {
+  const productPaths = [
+    {
+      title: "Audio generator",
+      description:
+        "Silence, sine tones, and textured noise built directly in your browser.",
+      to: "/audio",
+      meta: "FFmpeg WASM / local render",
+      icon: AudioWaveform,
+    },
+    {
+      title: "Video generator",
+      description:
+        "Assemble test footage with timing, format, and optional audio in one pass.",
+      to: "/video",
+      meta: "Preview-ready / export fast",
+      icon: Video,
+    },
+  ] as const;
+
+  const principles = [
+    {
+      title: "Rendered locally",
+      body: "Files stay on-device while FFmpeg runs in the browser.",
+    },
+    {
+      title: "Operational clarity",
+      body: "Shorter flows, clearer states, and less starter-template chrome.",
+    },
+    {
+      title: "Built for iteration",
+      body: "Switch formats, tweak settings, regenerate, download, repeat.",
+    },
+  ] as const;
+
+  const workflow = [
+    "Choose a generator and set the parameters that matter.",
+    "Run FFmpeg in-browser with visible progress feedback.",
+    "Preview the output immediately and download when it is ready.",
+  ] as const;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      <section className="container mx-auto px-4 py-16">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">
-            🚀 Client-Side Generation
-          </Badge>
-          <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Lorem Micsum
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Generate audio and video content directly in your browser using
-            FFmpeg
-          </p>
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-12 px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+      <section className="editorial-surface relative overflow-hidden px-6 py-8 sm:px-8 lg:px-12 lg:py-12">
+        <div className="absolute inset-y-0 right-0 hidden w-[42%] border-l border-border/50 bg-[linear-gradient(180deg,rgba(31,47,82,0.02),rgba(31,47,82,0.14))] lg:block" />
+        <div className="absolute right-10 bottom-10 hidden h-28 w-28 rounded-full border border-border/60 bg-background/60 lg:block" />
+
+        <div className="relative z-10 grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:items-end">
+          <div className="max-w-3xl">
+            <Badge
+              variant="outline"
+              className="stagger-fade mb-6 rounded-full px-4 py-2 text-[0.68rem] tracking-[0.24em]"
+            >
+              Browser-native generation suite
+            </Badge>
+            <div className="stagger-fade stagger-delay-1">
+              <p className="section-kicker mb-4">
+                Client-side audio and video rendering
+              </p>
+              <h1 className="font-display max-w-4xl text-6xl leading-[0.92] tracking-[-0.05em] text-foreground sm:text-7xl lg:text-[6.4rem]">
+                Lorem Micsum
+              </h1>
+            </div>
+            <p className="stagger-fade stagger-delay-2 mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
+              Generate media directly in the browser with a sharper workspace,
+              faster decisions, and no server handoff.
+            </p>
+            <div className="stagger-fade stagger-delay-3 mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg">
+                <Link to="/audio">
+                  Open audio generator
+                  <ArrowUpRight className="size-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link to="/video">Explore video workflow</Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid gap-4 lg:pl-10">
+            {principles.map((item, index) => (
+              <article key={item.title} className="editorial-panel p-5">
+                <p className="section-kicker mb-3">0{index + 1}</p>
+                <h2 className="mb-2 text-lg font-semibold tracking-[-0.03em] text-foreground">
+                  {item.title}
+                </h2>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {item.body}
+                </p>
+              </article>
+            ))}
+          </div>
         </div>
+      </section>
 
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
-          <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-            <CardHeader>
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl">⚡</span>
-              </div>
-              <CardTitle>Fast</CardTitle>
-              <CardDescription>
-                Generate content instantly without server requests or delays
-              </CardDescription>
-            </CardHeader>
-          </Card>
+      <section className="grid gap-6 lg:grid-cols-2">
+        {productPaths.map(({ title, description, to, meta, icon: Icon }) => (
+          <article
+            key={title}
+            className="editorial-surface group relative overflow-hidden p-6 sm:p-8"
+          >
+            <div className="absolute inset-x-0 top-0 h-px bg-border/80" />
+            <div className="absolute top-6 right-6 flex h-12 w-12 items-center justify-center rounded-full border border-border/70 bg-background/80 text-primary transition-transform duration-300 group-hover:-translate-y-1">
+              <Icon className="size-5" />
+            </div>
+            <p className="section-kicker mb-10">{meta}</p>
+            <div className="max-w-md">
+              <h2 className="font-display text-4xl leading-none tracking-[-0.04em] text-foreground">
+                {title}
+              </h2>
+              <p className="mt-4 text-base leading-7 text-muted-foreground">
+                {description}
+              </p>
+            </div>
+            <div className="mt-12 flex items-center justify-between gap-4 border-t border-border/70 pt-5">
+              <span className="text-sm font-medium text-muted-foreground">
+                Designed for quick iteration
+              </span>
+              <Button asChild variant="ghost">
+                <Link to={to}>
+                  Launch
+                  <ArrowUpRight className="size-4" />
+                </Link>
+              </Button>
+            </div>
+          </article>
+        ))}
+      </section>
 
-          <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-            <CardHeader>
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl">🔒</span>
-              </div>
-              <CardTitle>Secure</CardTitle>
-              <CardDescription>
-                Your files never leave your device since everything runs locally
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-            <CardHeader>
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl">🌐</span>
-              </div>
-              <CardTitle>Simple</CardTitle>
-              <CardDescription>
-                Open your settings, configure options, then generate instantly
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-
-        {/* Generation Options */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold mb-8">
-            What would you like to generate?
+      <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <article className="editorial-surface p-6 sm:p-8">
+          <p className="section-kicker mb-4">Workflow</p>
+          <h2 className="font-display text-4xl leading-none tracking-[-0.04em] text-foreground">
+            Fewer steps, clearer output.
           </h2>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Card className="w-full max-w-sm border-0 shadow-xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <CardContent className="p-8">
-                <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mb-6 mx-auto">
-                  <span className="text-3xl">🎵</span>
-                </div>
-                <h3 className="text-2xl font-bold mb-4">Audio Generation</h3>
-                <p className="text-muted-foreground mb-6">
-                  Create silence, sine waves, and noise with various formats
-                </p>
-                <Button asChild size="lg" className="w-full">
-                  <Link to="/audio">Generate Audio</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="w-full max-w-sm border-0 shadow-xl bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <CardContent className="p-8">
-                <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mb-6 mx-auto">
-                  <span className="text-3xl">🎬</span>
-                </div>
-                <h3 className="text-2xl font-bold mb-4">Video Generation</h3>
-                <p className="text-muted-foreground mb-6">
-                  Combine images and audio to create video content
-                </p>
-                <Button asChild size="lg" className="w-full">
-                  <Link to="/video">Generate Video</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* How it works */}
-        <div className="bg-white/60 dark:bg-slate-800/60 rounded-2xl p-8 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold text-center mb-8">How it works</h2>
-          <div className="grid md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">
-                1
-              </div>
-              <h3 className="font-semibold mb-2">Configure Settings</h3>
-              <p className="text-sm text-muted-foreground">
-                Choose audio type, format, and parameters
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">
-                2
-              </div>
-              <h3 className="font-semibold mb-2">FFmpeg Processing</h3>
-              <p className="text-sm text-muted-foreground">
-                FFmpeg WASM processes your request in browser
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">
-                3
-              </div>
-              <h3 className="font-semibold mb-2">Instant Generation</h3>
-              <p className="text-sm text-muted-foreground">
-                Get results immediately without servers
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">
-                4
-              </div>
-              <h3 className="font-semibold mb-2">Download</h3>
-              <p className="text-sm text-muted-foreground">
-                Download your generated files instantly
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Privacy Note */}
-        <div className="text-center mt-12">
-          <p className="text-sm text-muted-foreground">
-            <span className="font-semibold">Privacy:</span> Your files never
-            leave your device since Lorem Micsum does all the work locally.
+          <p className="mt-4 max-w-md text-sm leading-7 text-muted-foreground">
+            The interface stays focused on setup, generation state, and export
+            so the browser feels like a real production tool.
           </p>
+        </article>
+        <div className="editorial-surface divide-y divide-border/70 overflow-hidden">
+          {workflow.map((step, index) => (
+            <div
+              key={step}
+              className="grid gap-3 px-6 py-5 sm:grid-cols-[64px_minmax(0,1fr)] sm:items-start sm:px-8"
+            >
+              <div className="font-display text-4xl leading-none text-primary">
+                0{index + 1}
+              </div>
+              <p className="pt-1 text-base leading-7 text-foreground/88">
+                {step}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="editorial-surface flex flex-col gap-6 p-6 sm:flex-row sm:items-end sm:justify-between sm:p-8">
+        <div>
+          <p className="section-kicker mb-4">Local-first promise</p>
+          <h2 className="font-display text-4xl leading-none tracking-[-0.04em] text-foreground">
+            Your files stay with you.
+          </h2>
+          <p className="mt-4 max-w-xl text-sm leading-7 text-muted-foreground">
+            Lorem Micsum keeps the heavy lifting inside the browser, so previews
+            and exports happen without shipping media to a remote service.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Button asChild variant="outline" size="lg">
+            <Link to="/audio">Start with audio</Link>
+          </Button>
+          <Button asChild size="lg">
+            <Link to="/video">Open video</Link>
+          </Button>
         </div>
       </section>
     </div>
