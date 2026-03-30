@@ -9,19 +9,16 @@ const routes = [
   {
     path: "/",
     title: "Browser Audio and Video Generator | Lorem Micsum",
-    canonical: "https://lorem-micsum.example.com/",
     navigationSelector: null,
   },
   {
     path: "/audio",
     title: "Audio Generator | Lorem Micsum",
-    canonical: "https://lorem-micsum.example.com/audio",
     navigationSelector: 'a[href="/audio"]',
   },
   {
     path: "/video",
     title: "Video Generator | Lorem Micsum",
-    canonical: "https://lorem-micsum.example.com/video",
     navigationSelector: 'a[href="/video"]',
   },
 ];
@@ -128,14 +125,12 @@ async function prerender() {
 
       try {
         await page.waitForFunction(
-          ({ title, canonical }) =>
+          ({ title, path }) =>
             document.title === title &&
-            document.head
-              .querySelector('link[rel="canonical"]')
-              ?.getAttribute("href") === canonical,
+            window.location.pathname === path,
           {
             title: route.title,
-            canonical: route.canonical,
+            path: route.path,
           }
         );
       } catch (error) {
