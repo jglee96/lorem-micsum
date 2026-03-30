@@ -40,12 +40,21 @@ import {
   getDefaultFormState,
 } from "@/features/audio/schemas/audio.schema";
 import type { AudioSchemaType } from "@/features/audio/schemas/audio.schema";
+import type { FaqEntry } from "@/lib/seo";
 
 type FormData = AudioSchemaType & {
   bitrateK?: number;
 };
 
-export default function AudioGeneratorPage() {
+type AudioGeneratorPageProps = {
+  bestFor: readonly string[];
+  faqs: readonly FaqEntry[];
+};
+
+export default function AudioGeneratorPage({
+  bestFor,
+  faqs,
+}: AudioGeneratorPageProps) {
   const [progress, setProgress] = React.useState<number | null>(null);
   const [url, setUrl] = React.useState<string | null>(null);
   const [filename, setFilename] = React.useState("");
@@ -117,6 +126,11 @@ export default function AudioGeneratorPage() {
           <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
             Configure the signal, render it locally, and export a usable file
             without handing anything off to a server.
+          </p>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-foreground/84 sm:text-base">
+            This tool generates audio in the browser, including silence, sine
+            tones, and colored noise, then exports the finished file directly
+            from your local session.
           </p>
         </div>
         <div className="grid gap-3 sm:min-w-[320px]">
@@ -507,6 +521,41 @@ export default function AudioGeneratorPage() {
           </section>
         </aside>
       </div>
+
+      <section className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
+        <article className="editorial-surface p-6 sm:p-8">
+          <p className="section-kicker mb-4">Best for</p>
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
+            Quick local audio exports for testing and reference work
+          </h2>
+          <div className="mt-5 grid gap-3">
+            {bestFor.map((item) => (
+              <div key={item} className="editorial-panel px-4 py-3 text-sm leading-6 text-foreground/88">
+                {item}
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <section className="editorial-surface p-6 sm:p-8">
+          <p className="section-kicker mb-4">FAQ</p>
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
+            Common questions about the audio generator
+          </h2>
+          <div className="mt-6 grid gap-4">
+            {faqs.map((faq) => (
+              <article key={faq.question} className="editorial-panel p-5">
+                <h3 className="text-base font-semibold text-foreground">
+                  {faq.question}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {faq.answer}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+      </section>
     </div>
   );
 }

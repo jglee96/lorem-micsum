@@ -1,7 +1,7 @@
 {
-  "name": "My App",
-  "description": "My App description",
-  "short_name": "My App",
+  "name": "Lorem Micsum",
+  "description": "Browser-based audio and video generator for local test media and quick exports.",
+  "short_name": "Lorem Micsum",
   "icons": [
     {
       "src": "/favicon-72x72.png",
@@ -55,6 +55,6 @@
   "scope": "/",
   "start_url": "/?source=pwa",
   "display": "standalone",
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff"
+  "theme_color": "#f4efe7",
+  "background_color": "#f4efe7"
 }

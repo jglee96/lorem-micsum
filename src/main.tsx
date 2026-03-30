@@ -1,5 +1,5 @@
 import { StrictMode } from 'react'
-import ReactDOM from 'react-dom/client'
+import { createRoot, hydrateRoot } from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 
 // Import the generated route tree
@@ -27,13 +27,19 @@ declare module '@tanstack/react-router' {
 
 // Render the app
 const rootElement = document.getElementById('app')
-if (rootElement && !rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement)
-  root.render(
+if (rootElement) {
+  const app = (
     <StrictMode>
       <RouterProvider router={router} />
-    </StrictMode>,
+    </StrictMode>
   )
+
+  if (rootElement.innerHTML.trim()) {
+    hydrateRoot(rootElement, app)
+  } else {
+    const root = createRoot(rootElement)
+    root.render(app)
+  }
 }
 
 // If you want to start measuring performance in your app, pass a function

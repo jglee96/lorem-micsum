@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import VideoGeneratorPage from "@/components/video/page";
 import { VideoGenerationError } from "@/lib/video-gen";
+import { videoBestFor, videoFaqs } from "@/lib/seo-content";
 
 const generateVideoMock = vi.fn();
 
@@ -48,7 +49,7 @@ describe("VideoGeneratorPage", () => {
       filename: "lorem-micsum.mp4",
     });
 
-    render(<VideoGeneratorPage />);
+    render(<VideoGeneratorPage bestFor={videoBestFor} faqs={videoFaqs} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Generate video" }));
 
@@ -64,7 +65,7 @@ describe("VideoGeneratorPage", () => {
   });
 
   it("keeps video generation silent without exposing audio controls", async () => {
-    render(<VideoGeneratorPage />);
+    render(<VideoGeneratorPage bestFor={videoBestFor} faqs={videoFaqs} />);
 
     expect(screen.queryByLabelText("Include audio")).toBeNull();
     expect(screen.getByText("Silent test clips for preview and QA")).toBeTruthy();
@@ -78,7 +79,7 @@ describe("VideoGeneratorPage", () => {
       )
     );
 
-    render(<VideoGeneratorPage />);
+    render(<VideoGeneratorPage bestFor={videoBestFor} faqs={videoFaqs} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Generate video" }));
 

@@ -23,8 +23,17 @@ import {
   RotateCcw,
   Sparkles,
 } from "lucide-react";
+import type { FaqEntry } from "@/lib/seo";
 
-export default function VideoGeneratorPage() {
+type VideoGeneratorPageProps = {
+  bestFor: readonly string[];
+  faqs: readonly FaqEntry[];
+};
+
+export default function VideoGeneratorPage({
+  bestFor,
+  faqs,
+}: VideoGeneratorPageProps) {
   const [kind, setKind] = React.useState<VideoSource>("testsrc");
   const [format, setFormat] = React.useState<VideoFormat>("mp4");
   const [duration, setDuration] = React.useState(5);
@@ -87,6 +96,11 @@ export default function VideoGeneratorPage() {
           <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
             Tune source, duration, resolution, and format in one place, then
             render and inspect the result immediately.
+          </p>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-foreground/84 sm:text-base">
+            This tool assembles and exports video in the browser so you can
+            create local preview clips, QA footage, and format checks without
+            relying on a server-side render workflow.
           </p>
         </div>
         <div className="grid gap-3 sm:min-w-[320px]">
@@ -311,6 +325,41 @@ export default function VideoGeneratorPage() {
           </section>
         </aside>
       </div>
+
+      <section className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
+        <article className="editorial-surface p-6 sm:p-8">
+          <p className="section-kicker mb-4">Best for</p>
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
+            Synthetic clips, previews, and quick export checks
+          </h2>
+          <div className="mt-5 grid gap-3">
+            {bestFor.map((item) => (
+              <div key={item} className="editorial-panel px-4 py-3 text-sm leading-6 text-foreground/88">
+                {item}
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <section className="editorial-surface p-6 sm:p-8">
+          <p className="section-kicker mb-4">FAQ</p>
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
+            Common questions about the video generator
+          </h2>
+          <div className="mt-6 grid gap-4">
+            {faqs.map((faq) => (
+              <article key={faq.question} className="editorial-panel p-5">
+                <h3 className="text-base font-semibold text-foreground">
+                  {faq.question}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {faq.answer}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+      </section>
     </div>
   );
 }

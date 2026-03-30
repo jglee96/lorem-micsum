@@ -6,12 +6,50 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  createPageTitle,
+  createSoftwareApplicationJsonLd,
+  createWebSiteJsonLd,
+  usePageSeo,
+} from "@/lib/seo";
+
+const homeDescription =
+  "Lorem Micsum is a browser-based audio and video generator for creating local test media, preview clips, and quick exports without sending files to a server.";
+
+const homeSeo = {
+  title: createPageTitle("Browser Audio and Video Generator"),
+  description: homeDescription,
+  canonicalPath: "/",
+  ogTitle: "Browser Audio and Video Generator | Lorem Micsum",
+  ogDescription: homeDescription,
+  ogType: "website" as const,
+  robots: "index,follow",
+  jsonLd: [
+    createWebSiteJsonLd({
+      path: "/",
+      description: homeDescription,
+    }),
+    createSoftwareApplicationJsonLd({
+      name: "Lorem Micsum",
+      path: "/",
+      description: homeDescription,
+      applicationCategory: "MultimediaApplication",
+      featureList: [
+        "Generate audio and video directly in the browser",
+        "Keep renders local without uploading media to a server",
+        "Export quick test assets for QA, review, and previews",
+      ],
+    }),
+  ],
+};
 
 export const Route = createFileRoute("/")({
   component: App,
 });
 
 function App() {
+  usePageSeo(homeSeo);
+
   const productPaths = [
     {
       title: "Audio generator",
@@ -78,6 +116,11 @@ function App() {
               Generate media directly in the browser with a sharper workspace,
               faster decisions, and no server handoff.
             </p>
+            <p className="stagger-fade stagger-delay-2 mt-4 max-w-2xl text-sm leading-7 text-foreground/84 sm:text-base">
+              Lorem Micsum is a browser-based audio and video generator that
+              helps you create local test media, review clips, and downloadable
+              outputs without uploading files to a remote service.
+            </p>
             <div className="stagger-fade stagger-delay-3 mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg">
                 <Link to="/audio">
@@ -139,6 +182,32 @@ function App() {
             </div>
           </article>
         ))}
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+        <article className="editorial-surface p-6 sm:p-8">
+          <p className="section-kicker mb-4">Answer engine summary</p>
+          <h2 className="font-display text-4xl leading-none tracking-[-0.04em] text-foreground">
+            A local-first media generator for quick test assets.
+          </h2>
+          <p className="mt-4 max-w-xl text-sm leading-7 text-muted-foreground">
+            Use Lorem Micsum when you need browser-based audio and video
+            generation for QA, demos, placeholder media, or rapid format
+            checks. The app focuses on compact setup, clear export options, and
+            on-device rendering.
+          </p>
+        </article>
+        <div className="editorial-surface grid gap-px overflow-hidden bg-border/70">
+          {[
+            "What it does: generates browser-native audio and video test assets.",
+            "What you control: signal type, duration, format, source pattern, and resolution.",
+            "How it runs: FFmpeg executes locally in the browser without a server render pass.",
+          ].map((item) => (
+            <div key={item} className="bg-background px-6 py-5 text-sm leading-7 text-foreground/86 sm:px-8">
+              {item}
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
