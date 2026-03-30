@@ -5,7 +5,7 @@ import type {
   AudioKind,
   AudioNoiseColor,
 } from "@/types/audio";
-import { getFFmpeg } from "./ffmpeg";
+import { bindFFmpegEvents, getFFmpeg } from "./ffmpeg";
 
 export type GenOptions = {
   kind: AudioKind;
@@ -72,7 +72,10 @@ export async function generateAudio(
   opts: GenOptions,
   onProgress?: (p: number) => void
 ): Promise<{ blob: Blob; filename: string }> {
-  const ffmpeg = await getFFmpeg(onProgress);
+  const ffmpeg = await getFFmpeg();
+  const unbind = bindFFmpegEvents(ffmpeg, {
+    onProgress: onProgress ? (event) => onProgress(event.progress) : undefined,
+  });
 
   const input = buildInputFilter(opts);
   const codec = codecArgs(opts.format, opts.bitrateK);
@@ -93,12 +96,19 @@ export async function generateAudio(
     outName,
   ].filter(Boolean);
 
-  await ffmpeg.exec(args);
-  const data = await ffmpeg.readFile(outName);
-  const blob = new Blob([data as any], { type: mimeOf(opts.format) });
-  // 정리
-  await ffmpeg.deleteFile(outName);
-  return { blob, filename: outName };
+  try {
+    const exitCode = await ffmpeg.exec(args);
+    if (exitCode !== 0) {
+      throw new Error(`Audio render failed with exit code ${exitCode}`);
+    }
+
+    const data = await ffmpeg.readFile(outName);
+    const blob = new Blob([data as any], { type: mimeOf(opts.format) });
+    await ffmpeg.deleteFile(outName);
+    return { blob, filename: outName };
+  } finally {
+    unbind();
+  }
 }
 
 function mimeOf(fmt: AudioFormat): string {

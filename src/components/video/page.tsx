@@ -1,6 +1,10 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
-import { generateVideo } from "@/lib/video-gen";
+import {
+  generateVideo,
+  isVideoAudioMuxSupported,
+  VideoGenerationError,
+} from "@/lib/video-gen";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,9 +34,22 @@ export default function VideoGeneratorPage() {
   const [progress, setProgress] = React.useState<number | null>(null);
   const [url, setUrl] = React.useState<string | null>(null);
   const [filename, setFilename] = React.useState("");
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const audioMuxSupported = isVideoAudioMuxSupported(format);
+
+  React.useEffect(() => {
+    if (!audioMuxSupported && withAudio) {
+      setWithAudio(false);
+    }
+  }, [audioMuxSupported, withAudio]);
 
   const onGenerate = async () => {
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
+
     setUrl(null);
+    setErrorMessage(null);
     setProgress(0);
     try {
       const { blob, filename } = await generateVideo(
@@ -45,7 +62,12 @@ export default function VideoGeneratorPage() {
       setProgress(null);
     } catch (e) {
       console.error(e);
-      alert("Video generation failed. Try switching the format to mp4.");
+      setProgress(null);
+      setErrorMessage(
+        e instanceof VideoGenerationError
+          ? e.message
+          : "Video generation failed. Please review the settings and try again."
+      );
     }
   };
 
@@ -162,18 +184,25 @@ export default function VideoGeneratorPage() {
             <div>
               <p className="section-kicker mb-2">Optional audio track</p>
               <p className="text-sm leading-6 text-muted-foreground">
-                Include audio when you need a more realistic export artifact.
+                {audioMuxSupported
+                  ? "Include audio when you need a more realistic export artifact."
+                  : "Audio-in-video export is temporarily unavailable while we validate a stable browser FFmpeg path."}
               </p>
             </div>
-            <label className="flex cursor-pointer items-center gap-3 rounded-full border border-border/70 bg-background/65 px-4 py-3">
+            <label className="flex items-center gap-3 rounded-full border border-border/70 bg-background/65 px-4 py-3">
               <input
                 id="audio"
                 type="checkbox"
                 className="size-4 accent-[var(--color-primary)]"
-                checked={withAudio}
+                checked={audioMuxSupported ? withAudio : false}
+                disabled={!audioMuxSupported}
                 onChange={(e) => setWithAudio(e.target.checked)}
               />
-              <span className="font-ui text-sm font-semibold text-foreground">
+              <span
+                className={`font-ui text-sm font-semibold ${
+                  audioMuxSupported ? "text-foreground" : "text-muted-foreground"
+                }`}
+              >
                 Include audio
               </span>
             </label>
@@ -183,7 +212,9 @@ export default function VideoGeneratorPage() {
             <div className="flex min-h-11 items-center text-sm text-muted-foreground">
               {progress !== null
                 ? `Processing ${Math.max(0, Math.min(progress, 100))}%`
-                : "Ready to generate a local preview clip."}
+                : errorMessage
+                  ? errorMessage
+                  : "Ready to generate a local preview clip."}
             </div>
             <div className="flex flex-wrap gap-3">
               <Button onClick={onGenerate} disabled={progress !== null}>
@@ -199,6 +230,11 @@ export default function VideoGeneratorPage() {
                   setResolution("640x360");
                   setWithAudio(false);
                   setProgress(null);
+                  setErrorMessage(null);
+                  if (url) {
+                    URL.revokeObjectURL(url);
+                  }
+                  setUrl(null);
                 }}
               >
                 <RotateCcw className="size-4" />
@@ -206,6 +242,12 @@ export default function VideoGeneratorPage() {
               </Button>
             </div>
           </div>
+
+          {errorMessage ? (
+            <div className="mt-4 rounded-3xl border border-destructive/30 bg-destructive/8 px-4 py-3 text-sm text-destructive">
+              {errorMessage}
+            </div>
+          ) : null}
         </section>
 
         <aside className="grid gap-6">
@@ -221,7 +263,9 @@ export default function VideoGeneratorPage() {
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
               {url
                 ? "Inspect the generated output and download the file when it looks right."
-                : "Run a render to populate the preview area and export controls."}
+                : errorMessage
+                  ? "The render did not complete. Adjust the setup and try again."
+                  : "Run a render to populate the preview area and export controls."}
             </p>
 
             <div className="mt-6 editorial-panel p-4">
@@ -232,6 +276,8 @@ export default function VideoGeneratorPage() {
                     ? `${Math.max(0, Math.min(progress, 100))}%`
                     : url
                       ? "Complete"
+                      : errorMessage
+                        ? "Failed"
                       : "Idle"}
                 </span>
               </div>
@@ -244,6 +290,8 @@ export default function VideoGeneratorPage() {
                         ? Math.max(6, Math.min(progress, 100))
                         : url
                           ? 100
+                          : errorMessage
+                            ? 100
                           : 0
                     }%`,
                   }}
@@ -294,8 +342,9 @@ export default function VideoGeneratorPage() {
             ) : (
               <div className="mt-6 editorial-panel p-5">
                 <p className="text-sm leading-6 text-muted-foreground">
-                  Choose a source pattern and output format, then render to
-                  populate the preview.
+                  {errorMessage
+                    ? "The last render failed before a preview could be created."
+                    : "Choose a source pattern and output format, then render to populate the preview."}
                 </p>
               </div>
             )}

@@ -1,5 +1,6 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { toBlobURL } from "@ffmpeg/util";
+import type { LogEvent, ProgressEvent } from "@ffmpeg/ffmpeg";
 
 type FFmpegBundle = {
   coreURL: string;
@@ -30,15 +31,12 @@ async function getBundle(mt: boolean): Promise<FFmpegBundle> {
 }
 
 export async function getFFmpeg(
-  onProgress?: (ratio: number) => void
 ): Promise<FFmpeg> {
   if (_ffmpeg) return _ffmpeg;
   if (_loading) return _loading;
 
   _loading = (async () => {
     const ffmpeg = new FFmpeg();
-
-    if (onProgress) ffmpeg.on("progress", (p) => onProgress(p.progress));
 
     // 1) 멀티스레드 시도
     try {
@@ -62,4 +60,30 @@ export async function getFFmpeg(
   })();
 
   return _loading;
+}
+
+export function bindFFmpegEvents(
+  ffmpeg: FFmpeg,
+  handlers: {
+    onLog?: (event: LogEvent) => void;
+    onProgress?: (event: ProgressEvent) => void;
+  }
+): () => void {
+  if (handlers.onLog) {
+    ffmpeg.on("log", handlers.onLog);
+  }
+
+  if (handlers.onProgress) {
+    ffmpeg.on("progress", handlers.onProgress);
+  }
+
+  return () => {
+    if (handlers.onLog) {
+      ffmpeg.off("log", handlers.onLog);
+    }
+
+    if (handlers.onProgress) {
+      ffmpeg.off("progress", handlers.onProgress);
+    }
+  };
 }
