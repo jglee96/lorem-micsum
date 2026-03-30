@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "vite --port 3000",
     "start": "vite --port 3000",
-    "build": "vite build && tsc && pnpm exec playwright install chromium && node scripts/prerender.mjs",
+    "build": "vite build && tsc && node scripts/prerender.mjs",
     "serve": "vite preview",
     "prerender": "node scripts/prerender.mjs",
+    "prerender:install": "pnpm exec playwright install chromium",
     "test": "vitest run"
   },
   "dependencies": {
